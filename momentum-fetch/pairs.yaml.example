@@ -1,0 +1,10 @@
+pairs:
+  - name: "WIFI"
+    chain: "polygon"
+    address: "0xcf0bb95967cd006f5eaa1463c9d710d1e1550a96"
+    timeAdded: "2023-12-21T18:45:00"
+
+  - name: "CPOOL"
+    chain: "ethereum"
+    address: "0xa7600c4fbddb57e44018bee74a5f6b636cb68352"
+    timeAdded: "2023-12-21T18:45:00"
