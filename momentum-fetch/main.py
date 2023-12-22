@@ -28,6 +28,9 @@ def flatten_json_to_dataframe(data):
     if 'labels' in df.columns:
         df['labels'] = df['labels'].apply(json.dumps)
 
+    df['priceUsd'] = df['priceUsd'].astype(float)
+    df['priceNative'] = df['priceNative'].astype(float)
+
     return df
 
 def get_service_account():
