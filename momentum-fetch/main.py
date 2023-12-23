@@ -69,6 +69,8 @@ def main_function(request):
 
     with open('pairs.yaml', 'r') as file:
         pairs_config = yaml.safe_load(file)
+
+    df = pd.DataFrame()
     
     for pair in pairs_config['pairs']:
         if is_recently_added(pair['timeAdded']):
@@ -78,6 +80,8 @@ def main_function(request):
             api_data = fetch_api_data(chain, address)
             dataframe = flatten_json_to_dataframe(api_data)
             dataframe = add_timestamp(dataframe)
-            insert_data_into_bigquery(dataset_id, table_id, dataframe)
+            df = pd.concat([df, dataframe], ignore_index=True)
+    
+    insert_data_into_bigquery(dataset_id, table_id, df)
 
     return 'All recent data inserted successfully!'
