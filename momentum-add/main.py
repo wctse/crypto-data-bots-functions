@@ -54,7 +54,7 @@ def telegram_bot_webhook(request):
 
             # Firestore logic
             current_time = datetime.now(pytz.UTC)
-            doc_ref = db.collection("momentum").document(str(current_time))
+            doc_ref = db.collection("tracked-tokens").document(str(current_time))
             doc_ref.set({'name': name, 'chainId': chainId, 'pairAddress': pair_address, 'addedTime': current_time})
 
         # Tell the user all the tokens added
