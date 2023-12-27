@@ -37,21 +37,29 @@ def telegram_bot_webhook(request):
 
         print(f"Received message: {text} from chat ID: {chat_id}")
 
-        # Directly get the data from url
-        # Example entry: https://dexscreener.com/arbitrum/0x90ff2b6b6a2eb3c68d883bc276f6736b1262fa50
-        # Split the string by space to separate the token name and the URL
-        _, _, _, chainId, pair_address = text.split('/')
-        api_info = requests.get(f"https://api.dexscreener.com/latest/dex/pairs/{chainId}/{pair_address}")
-        name = api_info.json()['pairs'][0]['baseToken']['name']
+        # Directly get the data from urls
+        # Example entry: https://dexscreener.com/arbitrum/0x90ff2b6b6a2eb3c68d883bc276f6736b1262fa50\nhttps://dexscreener.com/optimism/0x68f5c0a2de713a54991e01858fd27a3832401849
+        tokens = text.split('\n')
+        names = []
 
-        if not name:
-            raise Exception("Failed to obtain name from pair address.")
+        for token in tokens:
+            _, _, _, chainId, pair_address = token.split('/')
+            api_info = requests.get(f"https://api.dexscreener.com/latest/dex/pairs/{chainId}/{pair_address}")
+            name = api_info.json()['pairs'][0]['baseToken']['name']
 
-        # Firestore logic
-        current_time = datetime.now(pytz.UTC)
-        doc_ref = db.collection("momentum").document(str(current_time))
-        doc_ref.set({'name': name, 'chainId': chainId, 'pairAddress': pair_address, 'addedTime': current_time})
-        send_message(chat_id, f"Pair {pair_address} with name {name} added successfully at {current_time}.")
+            names.append(name)
+
+            if not name:
+                raise Exception("Failed to obtain name from pair address.")
+
+            # Firestore logic
+            current_time = datetime.now(pytz.UTC)
+            doc_ref = db.collection("momentum").document(str(current_time))
+            doc_ref.set({'name': name, 'chainId': chainId, 'pairAddress': pair_address, 'addedTime': current_time})
+
+        # Tell the user all the tokens added
+        send_message(chat_id, f"Added the following pairs into the database at {current_time}:\n" + "\n".join(names))
+                     
 
     except ValueError:
         send_message(chat_id, "Invalid format.")
